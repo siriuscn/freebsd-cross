@@ -1,7 +1,9 @@
 # This Dockerfile creates a static build image for CI
 
 FROM alpine:3.8
-LABEL maintainer "Sirius <sirius@331862034@qq.com>"
+LABEL maintainer="Sirius <sirius@331862034@qq.com>" \
+    references="Greg V <greg@unrelenting.technology>" \
+    references="db@donbowman.ca"
 
 # Install pkg on Linux to download dependencies into the FreeBSD root
 RUN apk add --no-cache curl gcc pkgconf make autoconf automake libtool musl-dev \ 
