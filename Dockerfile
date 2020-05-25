@@ -14,7 +14,7 @@ RUN mkdir /pkg && \
 		bsdtar -xf - -C /pkg && \
 	cd /pkg/pkg-* && \
 	./autogen.sh && \
-	CFLAGS="-D__BEGIN_DECLS='' -D__END_DECLS='' -DALLPERMS='S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO' -Droundup2='roundup'" \
+	CFLAGS="-D__BEGIN_DECLS='' -D__END_DECLS='' -DALLPERMS='S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO' -Droundup2='roundup' -Wno-cpp" \
 		LDFLAGS="-lfts" ./configure && \
 	touch /usr/include/sys/unistd.h && \
 	touch /usr/include/sys/sysctl.h && \
@@ -44,18 +44,12 @@ RUN apk add --no-cache gcc g++ file
 
 ENV PATH /usr/local/cross-compiler/bin:/freebsd/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-RUN curl -OLs https://mirrors.sjtug.sjtu.edu.cn/gnu/binutils/binutils-2.25.1.tar.gz && \
-    curl -OLs https://mirrors.sjtug.sjtu.edu.cn/gnu/gcc/gcc-5.5.0/gcc-5.5.0.tar.xz && \
-    curl -OLs https://mirrors.sjtug.sjtu.edu.cn/gnu/gmp/gmp-6.0.0a.tar.xz && \
-    curl -OLs https://mirrors.sjtug.sjtu.edu.cn/gnu/mpc/mpc-1.0.3.tar.gz && \
-    curl -OLs https://mirrors.sjtug.sjtu.edu.cn/gnu/mpfr/mpfr-3.1.3.tar.xz
-
 RUN mkdir -p /src && \
-    tar -zxf binutils-2.25.1.tar.gz -C /src && \
-    tar -Jxf gcc-5.5.0.tar.xz -C /src && \
-    tar -Jxf gmp-6.0.0a.tar.xz -C /src && \
-    tar -zxf mpc-1.0.3.tar.gz -C /src && \
-    tar -Jxf mpfr-3.1.3.tar.xz -C /src
+    curl -Ls https://mirrors.sjtug.sjtu.edu.cn/gnu/binutils/binutils-2.25.1.tar.gz | bsdtar -xf - -C /src && \
+    curl -Ls https://mirrors.sjtug.sjtu.edu.cn/gnu/gcc/gcc-5.5.0/gcc-5.5.0.tar.xz | bsdtar -xf - -C /src  && \
+    curl -Ls https://mirrors.sjtug.sjtu.edu.cn/gnu/gmp/gmp-6.0.0a.tar.xz | bsdtar -xf - -C /src  && \
+    curl -Ls https://mirrors.sjtug.sjtu.edu.cn/gnu/mpc/mpc-1.0.3.tar.gz | bsdtar -xf - -C /src  && \
+    curl -Ls https://mirrors.sjtug.sjtu.edu.cn/gnu/mpfr/mpfr-3.1.3.tar.xz | bsdtar -xf - -C /src 
 
 RUN cd /src/binutils-2.25.1 && \
     ./configure --enable-libssp --enable-ld --target=x86_64-pc-freebsd9 --prefix=/usr/local/cross-compiler/ && \
@@ -87,7 +81,8 @@ RUN cd /src/binutils-2.25.1 && \
         --prefix=/usr/local/cross-compiler/ --with-gmp=/usr/local/cross-compiler \
         --with-mpc=/usr/local/cross-compiler --with-mpfr=/usr/local/cross-compiler --disable-libgomp && \
     LD_LIBRARY_PATH=/usr/local/cross-compiler/lib make -j10 && \
-    make install
+    make install && \
+    rm -rf /src
 
 # Configure pkg-config
 ENV PKG_CONFIG_LIBDIR /freebsd/usr/libdata/pkgconfig:/freebsd/usr/local/libdata/pkgconfig

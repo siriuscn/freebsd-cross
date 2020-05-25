@@ -1,7 +1,6 @@
 # freebsd-cross
-Cross compiler for FreeBSD
 
-Cross compiler ( GCC ) for FreeBSD 9 on Linux container.
+Cross compiler ( GCC ) for FreeBSD 9 x86_64 on Linux container.
 
 Complier path is at /usr/local/cross-compiler/bin. It has been added to your PATH environment variable.
 
